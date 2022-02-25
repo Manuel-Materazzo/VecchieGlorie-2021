@@ -1,0 +1,107 @@
+<div class="animated fadeIn">
+  <h3 class="tabletitle">Tessere</h3>
+  <p-toast position="bottom-right"></p-toast>
+  <div class="card">
+    <p-toolbar styleClass="p-mb-4">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="Nuovo " icon="pi pi-plus" class="p-button-success p-mr-2 space-right"
+                (click)="openNew()"></button>
+      </ng-template>
+
+      <ng-template pTemplate="right">
+        <div class="p-d-flex p-ai-center p-jc-between">
+        <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                           placeholder="Cerca..."/>
+        </span>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="tessere"
+             [rows]="5"
+             [paginator]="true"
+             [globalFilterFields]="['id_tessera']"
+             [rowHover]="true" dataKey="id_tessera"
+             styleClass="p-datatable-striped p-datatable-sm"
+             currentPageReportTemplate="Visualizzo da linea {first} a linea {last} di {totalRecords} linee totali"
+             [showCurrentPageReport]="true"
+             [rowsPerPageOptions]="[5,10,25]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Numero tessera</th>
+          <th>Data di creazione </th>
+          <th>Anno di Validità</th>
+          <th style="width: 6rem">Azioni</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-tessera>
+        <tr>
+          <td>{{tessera.id_tessera}}</td>
+          <td>{{tessera.data_creazione  | date: 'dd/MM/yyyy'}}</td>
+          <td>{{tessera.inizio_abbonamento  | date: 'yyyy'}}</td>
+          <td>
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-error p-mr-2"
+                    (click)="editTessera(tessera)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [(visible)]="showDialog" [style]="{width: '450px'}" [header]="findPersonaNameById(tessera.idPersona)" [modal]="true"
+            styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;" *ngIf="!tessera.id_tessera">
+         <span class="p-input-icon-left p-float-label">
+          <i class="cil-contact"
+             [ngStyle]="{'color': ((!socioCodiceFiscale || codfiscErr) && submitted) ? 'red' : '#525252' }"></i>
+          <input id="codfisc_socio" type="text" [(ngModel)]="socioCodiceFiscale" pInputText placeholder="Codice Fiscale Socio">
+           <label class="errore" for="codfisc_socio" *ngIf="submitted && codfiscErr">Codice Fiscale non presente nel database</label>
+         </span>
+
+      </div>
+
+      <div class="p-formgroup-inline" style="margin-top: 10px; width: 99%;">
+        <span class="p-input-icon-left" style="display: inline-block; width: 99%;">
+          <i class="cil-calendar-check"
+             [ngStyle]="{'color': (!tessera.data_creazione && submitted) ? 'red' : '#525252' }"></i>
+           <input type="text"
+                  pInputText
+                  placeholder="Data di creazione"
+                  class="form-control" style="border: 1px solid #ced4da; height: 40px;"
+                  [ngModel]="tessera.data_creazione | date: 'dd/MM/yyyy'"
+                  (ngModelChange)="tessera.data_creazione = $event"
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY'}"
+                  bsDatepicker>
+        </span>
+      </div>
+
+      <div class="p-formgroup-inline" style="margin-top: 10px; width: 99%;">
+        <span class="p-input-icon-left" style="display: inline-block; width: 99%;">
+           <i class="cil-calendar"
+              [ngStyle]="{'color': (!tessera.inizio_abbonamento && submitted) ? 'red' : '#525252' }"></i>
+           <input type="text"
+                  pInputText
+                  placeholder="Anno di Validità"
+                  class="form-control inline-block" style="border: 1px solid #ced4da; height: 40px; width: 73%; display: inline-block;"
+                  [bsConfig]="bsConfig"
+                  [(ngModel)]="tessera.inizio_abbonamento"
+                  bsDatepicker>
+          <button pButton pRipple label="Rinnova" class="p-button-info p-mr-2 space-right"
+                  (click)="renewTessera()" style="display: inline-block; width: 25%;"></button>
+        </span>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTessera()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+</div>

@@ -1,0 +1,39 @@
+.p-sortable-column-icon{
+  margin:0px !important;
+}
+
+.errore{
+  color: red !important;
+  top: -.3rem !important;
+  font-size: 11px !important;
+  margin-bottom: 1px;
+}
+.smallimg{
+  display: block;
+  max-width:200px;
+  max-height:100px;
+  width: auto;
+  height: auto;
+}
+
+.bigimg{
+  display: block;
+  max-width:700px;
+  max-height:700px;
+  width: auto;
+  height: auto;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+.tabletitle{
+  position: absolute;
+  z-index: 100;
+  top: 17.5%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+

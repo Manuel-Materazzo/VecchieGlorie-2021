@@ -1,0 +1,34 @@
+.p-sortable-column-icon{
+  margin:0px !important;
+}
+
+.fc-nuovo-button{
+  background: #689F38 !important;
+  border: 1px solid #689F38 !important;
+}
+
+.fc-nuovo-button:active{
+  background: #4e772b !important;
+  border: 1px solid #689F38 !important;
+}
+
+.fc-nuovo-button:focus{
+  box-shadow: 0 0 0 0.2rem #c2e0a8 !important;
+}
+
+.p-dialog-content{
+  padding-bottom: 15px !important;
+}
+
+.form-control:disabled, .p-component:disabled{
+  background: #e8e8e8 !important;
+  opacity: 80%;
+}
+.tabletitle{
+  position: absolute;
+  z-index: 100;
+  top: 17.5%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}

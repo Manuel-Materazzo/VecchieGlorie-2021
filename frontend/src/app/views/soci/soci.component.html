@@ -1,0 +1,272 @@
+<div class="animated fadeIn">
+  <h3 class="tabletitle">Soci e Visitatori</h3>
+  <p-toast position="bottom-right"></p-toast>
+  <div class="card">
+    <p-toolbar styleClass="p-mb-4">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="Nuovo " icon="pi pi-plus" class="p-button-success p-mr-2 space-right"
+                (click)="openNew()" *ngIf="personeSelezionate == null || personeSelezionate.length == 0"></button>
+        <button pButton pRipple label="Elimina" icon="pi pi-trash" class="p-button-danger"
+                (click)="deleteSelectedPersone()"
+                *ngIf="personeSelezionate != null && personeSelezionate.length > 0"></button>
+      </ng-template>
+
+      <ng-template pTemplate="right">
+
+
+        <div class="p-d-flex p-ai-center p-jc-between">
+        <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                           placeholder="Cerca..."/>
+        </span>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="persone"
+             [rows]="5"
+             [paginator]="true"
+             [globalFilterFields]="['nome','cognome','consiglio']"
+             [(selection)]="personeSelezionate"
+             [rowHover]="true" dataKey="idPersona"
+             styleClass="p-datatable-striped p-datatable-sm"
+             currentPageReportTemplate="Visualizzo da linea {first} a linea {last} di {totalRecords} linee totali"
+             [showCurrentPageReport]="true"
+             [rowsPerPageOptions]="[5,10,25]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th pSortableColumn="nome">Nome
+            <p-sortIcon field="nome"></p-sortIcon>
+          </th>
+          <th pSortableColumn="cognome">Cognome
+            <p-sortIcon field="cognome"></p-sortIcon>
+          </th>
+          <th>Data di nascita</th>
+          <th>Codice Fiscale</th>
+          <th>Numero di Telefono</th>
+          <th>Mail</th>
+          <th style="width: 7rem" *ngIf="loadedPage">Numero Tessera</th>
+          <th pSortableColumn="consiglio" style="width: 7rem" *ngIf="loadedPage">Parte del Consiglio
+            <p-sortIcon field="consiglio"></p-sortIcon>
+          </th>
+          <th style="width: 6rem">Azioni</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-persona>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="persona"></p-tableCheckbox>
+          </td>
+          <td>{{persona.nome}}</td>
+          <td>{{persona.cognome}}</td>
+          <td>{{persona.data_nascita  | date: 'dd/MM/yyyy'}}</td>
+          <td>{{persona.cod_fiscale}}</td>
+          <td>{{persona.n_telefono}}</td>
+          <td>{{persona.mail}}</td>
+          <td *ngIf="loadedPage">{{persona.id_tessera}}</td>
+          <td *ngIf="loadedPage">{{persona.consiglio && 'Si' || 'No'}}</td>
+          <td>
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-error p-mr-2"
+                    (click)="editPersona(persona)"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-danger"
+                    (click)="deletePersona(persona)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [(visible)]="showDialog" [style]="{width: '520px'}" header="Dettagli" [modal]="true"
+            styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+        <span class="p-input-icon-left" style="display: inline-block; width: 49%;">
+          <i class="cil-contact"
+             [ngStyle]="{'color': (persona.nome == null && submitted) ? 'red' : '#525252' }"></i>
+          <input id="Nome" type="text" [(ngModel)]="persona.nome" pInputText placeholder="Nome">
+        </span>
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 50%;">
+           <i class="cil-contact"
+              [ngStyle]="{'color': (persona.cognome == null && submitted) ? 'red': '#525252' }"></i>
+           <input id="Cognome" type="text" [(ngModel)]="persona.cognome" pInputText placeholder="Cognome">
+        </span>
+      </div>
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+         <span class="p-input-icon-left" style="display: inline-block; width: 49%;">
+          <i class="cil-calendar"
+             [ngStyle]="{'color': persona.data_nascita == null && submitted ? 'red': '#525252' }"></i>
+          <input type="text"
+                 pInputText
+                 placeholder="Data di nascita"
+                 class="form-control" style="border: 1px solid #ced4da; height: 40px;"
+                 [ngModel]="persona.data_nascita | date: 'dd/MM/yyyy'"
+                 (ngModelChange)="persona.data_nascita = $event"
+                 [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY'}"
+                 bsDatepicker>
+         </span>
+
+        <span class="p-input-icon-left p-float-label" style="display: inline-block; width: 50%;">
+           <i class="cil-contact"
+              [ngStyle]="{'color': ((persona.cod_fiscale == null && submitted) || codfiscErr) ? 'red': '#525252' }"></i>
+           <input id="Codice_fiscale" type="text" [(ngModel)]="persona.cod_fiscale" pInputText
+                  placeholder="Codice Fiscale">
+          <label class="errore" for="Codice_fiscale" *ngIf="submitted && codfiscErr">Codice Fiscale non valido</label>
+        </span>
+      </div>
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+        <span class="p-input-icon-left p-float-label" style="display: inline-block; width: 49%;">
+           <i class="cil-phone"
+              [ngStyle]="{'color': telefonoErr ? 'red' : '#525252' }"></i>
+           <input id="Numero_telefono" type="text" [(ngModel)]="persona.n_telefono" pInputText
+                  placeholder="Numero di Telefono">
+           <label class="errore" for="Numero_telefono" *ngIf="submitted && telefonoErr">Numero non valido</label>
+        </span>
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 50%;">
+           <i class="cil-at"></i>
+           <input id="Mail" type="text" [(ngModel)]="persona.mail" pInputText placeholder="Mail">
+        </span>
+      </div>
+
+      <div class="p-field-radiobutton" style="display: inline-block; width: 30%; margin-left: 15%; margin-top: 13px;"
+           *ngIf="!persona.idPersona">
+        <p-radioButton name="socio" [value]="true" [(ngModel)]="socio" inputId="sociogroup"></p-radioButton>
+        <label style="margin-bottom: 0px">Socio</label>
+      </div>
+
+      <div class="p-field-radiobutton" style="display: inline-block; width: 35%; margin-left: 10%; margin-top: 13px;"
+           *ngIf="!persona.idPersona">
+        <p-radioButton name="visitatore" [value]="false" [(ngModel)]="socio" inputId="sociogroup"></p-radioButton>
+        <label style="margin-bottom: 0px">Visitatore</label>
+      </div>
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;" *ngIf="socio && !persona.idPersona">
+        <span class="p-input-icon-left" style="display: inline-block; width: 99%;">
+           <i class="cil-calendar"
+              [ngStyle]="{'color': (tessera.inizio_abbonamento == null && submitted) ? 'red': '#525252' }"></i>
+           <input type="text"
+                  pInputText
+                  placeholder="Anno di Validità della Tessera"
+                  class="form-control" style="border: 1px solid #ced4da; height: 40px;"
+                  [bsConfig]="bsConfig"
+                  [(ngModel)]="tessera.inizio_abbonamento"
+                  bsDatepicker>
+        </span>
+      </div>
+
+      <div class="p-field-checkbox" style="margin-top: 13px;" *ngIf="socio">
+        <p-checkbox name="consiglio" binary="true" [(ngModel)]="persona.consiglio" inputId="consiglio"></p-checkbox>
+        <label style="margin-bottom: 0 !important;">Parte del consiglio</label>
+      </div>
+
+      <div class="p-field-checkbox" style="margin-top: 13px;" *ngIf="!persona.idPersona">
+        <button pButton pRipple label="Aggiungi un auto " icon="pi pi-plus" class="p-button-success p-mr-2 space-right"
+                [disabled]="auto.foto != null" (click)="openNewAuto()"></button>
+      </div>
+
+      <small class="p-error" *ngIf="!persona.idPersona && submitted && auto.foto == null">Devi aggiungere
+        un'auto!</small>
+
+    </ng-template>
+
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="savePersona()"></button>
+    </ng-template>
+  </p-dialog>
+
+
+  <!-- QUI INIZIA IL DIALOG DELL'AUTO -->
+
+  <p-dialog [(visible)]="showAutoDialog" [style]="{width: '520px'}" header="Dettagli Auto" [modal]="true"
+            styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+        <span class="p-input-icon-left">
+          <i class="cil-car-alt"
+             [ngStyle]="{'color': (!auto.n_telaio && submittedAuto) ? 'red' : '#525252' }"></i>
+          <input id="N_telaio" type="text" [(ngModel)]="auto.n_telaio" pInputText placeholder="Numero Telaio">
+        </span>
+
+      </div>
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+        <span class="p-input-icon-left" style="display: inline-block; width: 49%;">
+          <i class="cil-car-alt"
+             [ngStyle]="{'color': (!auto.marca && submittedAuto) ? 'red' : '#525252' }"></i>
+          <input id="Marca" type="text" [(ngModel)]="auto.marca" pInputText placeholder="Marca">
+        </span>
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 50%;">
+           <i class="cil-car-alt"
+              [ngStyle]="{'color': (!auto.modello && submittedAuto) ? 'red' : '#525252' }"></i>
+           <input id="Modello" type="text" [(ngModel)]="auto.modello" pInputText placeholder="Modello">
+        </span>
+      </div>
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+        <span class="p-input-icon-left" style="display: inline-block; width: 49%;">
+          <i class="cil-calendar"
+             [ngStyle]="{'color': (!auto.anno_immatricolazione && submittedAuto) ? 'red' : '#525252' }"></i>
+          <input type="text"
+                 pInputText
+                 placeholder="Anno di immatricolazione"
+                 class="form-control" style="border: 1px solid #ced4da; height: 40px;"
+                 [bsConfig]="bsConfig"
+                 [(ngModel)]="auto.anno_immatricolazione"
+                 bsDatepicker>
+        </span>
+
+        <span class="p-input-icon-left  p-float-label" style="display: inline-block; width: 50%;">
+           <i class="cil-contact"
+              [ngStyle]="{'color': certificazioneErr ? 'red' : '#525252' }"></i>
+           <input id="Cod_certificazione" type="text" [(ngModel)]="auto.cod_certificazione" pInputText
+                  placeholder="Certificazione">
+          <label class="errore" for="Cod_certificazione"
+                 *ngIf="submitted && certificazioneErr">Dev' essere un numero!</label>
+        </span>
+      </div>
+
+      <div class="p-formgroup-inline" style="margin-top: 13px;">
+        <p-fileUpload name="file" (onSelect)="handleImages($event.files)"
+                      accept="image/*" maxFileSize="10000000" [auto]="true" chooseLabel="Scegli foto">
+          <ng-template pTemplate="toolbar">
+            <small class="p-error" *ngIf="submittedAuto && auto.foto == null">Devi selezionare una foto!</small>
+          </ng-template>
+          <ng-template pTemplate="file">
+            <div>
+                <span *ngIf="auto.foto != null"> <img [src]="imageSrc" alt="rip" style="width: 150px;"/>
+                  {{ (auto.foto.name.length > 10) ? (auto.foto.name | slice:0:10) + '...' : (auto.foto.name) }}
+                  -  {{auto.foto.size | filesize}}
+                </span>
+            </div>
+          </ng-template>
+        </p-fileUpload>
+      </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+              (click)="hideAutoDialog()"></button>
+      <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveAuto()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+</div>

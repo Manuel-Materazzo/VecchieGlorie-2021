@@ -1,0 +1,136 @@
+<div class="animated fadeIn">
+  <p-toast position="bottom-right"></p-toast>
+  <h3 class="tabletitle">Partecipanti alle manifestazioni</h3>
+  <div class="card">
+    <p-toolbar styleClass="p-mb-4">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="Nuovo " icon="pi pi-plus" class="p-button-success p-mr-2 space-right"
+                (click)="openNew()" *ngIf="partecipantiSelezionati == null || partecipantiSelezionati.length == 0"></button>
+        <button pButton pRipple label="Elimina" icon="pi pi-trash" class="p-button-danger"
+                (click)="deleteSelectedPartecipazioni()"
+                *ngIf="partecipantiSelezionati != null && partecipantiSelezionati.length > 0"></button>
+      </ng-template>
+
+      <ng-template pTemplate="right">
+        <div class="p-d-flex p-ai-center p-jc-between">
+        <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                           placeholder="Cerca..."/>
+        </span>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="partecipanti"
+             [rows]="5"
+             [paginator]="true"
+             [globalFilterFields]="['id_manifestazione','partecipa']"
+             [(selection)]="partecipantiSelezionati"
+             [rowHover]="true" dataKey="id_partecipazione"
+             styleClass="p-datatable-striped p-datatable-sm"
+             currentPageReportTemplate="Visualizzo da linea {first} a linea {last} di {totalRecords} linee totali"
+             [showCurrentPageReport]="true"
+             [rowsPerPageOptions]="[5,10,25]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th pSortableColumn="id_manifestazione">ID manifestazione
+            <p-sortIcon field="id_manifestazione"></p-sortIcon>
+          </th>
+          <th>Numero di telaio</th>
+          <th pSortableColumn="partecipa">Partecipa
+            <p-sortIcon field="partecipa"></p-sortIcon>
+          </th>
+          <th>Numero persone</th>
+          <th>Quota versata</th>
+          <th style="width: 6rem">Azioni</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-partecipante>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="partecipante"></p-tableCheckbox>
+          </td>
+          <td>{{partecipante.id_manifestazione}}</td>
+          <td>{{partecipante.n_telaio}}</td>
+          <td>{{partecipante.partecipa && 'Si' || 'No'}}</td>
+          <td>{{partecipante.numero_persone}}</td>
+          <td>{{partecipante.quota_versata}}</td>
+          <td>
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-error p-mr-2"
+                    (click)="editPartecipazioni(partecipante)"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-danger"
+                    (click)="deletePartecipazioni(partecipante)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+
+
+  <p-dialog [(visible)]="showDialog" [style]="{width: '540px'}" header="Dettagli" [modal]="true"
+            styleClass="p-fluid">
+    <ng-template pTemplate="content">
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+         <span class="p-input-icon-left p-float-label" style="display: inline-block; width: 49%;">
+          <i class="cil-calendar"
+             [ngStyle]="{'color': partecipante.id_manifestazione == null && submitted ? 'red': '#525252' }"></i>
+          <input id="manifestazione" type="text" [(ngModel)]="partecipante.id_manifestazione" pInputText placeholder="Id Manifestazione">
+           <label class="errore" for="manifestazione" *ngIf="submitted && erroreManifestazione">Manifestazione non valida</label>
+         </span>
+
+        <span class="p-input-icon-left p-float-label" style="display: inline-block; width: 50%;">
+           <i class="cil-car-alt"
+              [ngStyle]="{'color': partecipante.n_telaio == null && submitted ? 'red': '#525252' }"></i>
+           <input id="ntelaio" type="text" [(ngModel)]="partecipante.n_telaio" pInputText placeholder="Numero del Telaio">
+          <label class="errore" for="ntelaio" *ngIf="submitted && erroreTelaio">Numero Telaio non valido</label>
+          </span>
+      </div>
+
+
+      <div class="p-formgroup-inline" style="margin-top: 13px; width: 99%;">
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 33%;">
+          <i class="pi cil-people"
+             [ngStyle]="{'color': partecipante.numero_persone == null && submitted ? 'red': '#525252' }"></i>
+          <input id="costo_a_persona" type="text" [(ngModel)]="partecipante.numero_persone" pInputText placeholder="Numero Persone">
+        </span>
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 33%;">
+          <i class="pi pi-euro"
+             [ngStyle]="{'color': partecipante.quota_versata == null && submitted ? 'red': '#525252' }"></i>
+          <input id="numero_massimo" type="text" [(ngModel)]="partecipante.quota_versata" pInputText placeholder="Quota Versata">
+        </span>
+
+        <span class="p-input-icon-left" style="display: inline-block; width: 32%;">
+          <i class="pi pi-wallet"></i>
+          <input id="soldi_totali" type="text" [disabled]="true"
+                 [value]="((findCostoPersona(partecipante.id_manifestazione) * partecipante.numero_persone) -
+                  partecipante.quota_versata) > 0 ? ((findCostoPersona(partecipante.id_manifestazione) *
+                  partecipante.numero_persone) - partecipante.quota_versata) : 0 + ' €'" pInputText>
+        </span>
+
+      </div>
+
+      <div class="p-field-checkbox">
+        <p-checkbox name="partecipa" binary="true" [(ngModel)]="partecipante.partecipa" inputId="partecipa"></p-checkbox>
+        <label style="margin-bottom: 0 !important;">Partecipa alla Manifestazione</label>
+      </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="savePartecipazione()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+</div>

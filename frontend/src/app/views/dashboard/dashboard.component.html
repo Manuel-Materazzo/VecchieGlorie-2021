@@ -1,0 +1,189 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6 col-lg-3">
+      <div class="brand-card">
+        <div class="brand-card-header bg-facebook">
+          <h2 style="color: white;"> {{ lastYear }} </h2>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <div class="text-value">{{statistiche.manifestazioniAnnoPrecedente}}</div>
+            <div class="text-uppercase text-muted small">Manifestazioni</div>
+          </div>
+          <div>
+            <div class="text-value">{{statistiche.partecipantiAnnoPrecedente}}</div>
+            <div class="text-uppercase text-muted small">Partecipanti</div>
+          </div>
+        </div>
+      </div>
+    </div><!--/.col-->
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card text-white bg-facebook">
+        <div class="card-body pb-3">
+          <div class="text-value">{{statistiche.membriAnnoPrecedente}}</div>
+          <div>Membri del club</div>
+        </div>
+        <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+          <canvas baseChart class="chart"
+                  [datasets]="lastYearData"
+                  [labels]="mesi"
+                  [options]="lastYearOptions"
+                  [colors]="lastYearColours"
+                  [legend]="false"
+                  [chartType]="'line'"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="brand-card">
+        <div class="brand-card-header bg-google-plus">
+          <h2 style="color: white;"> {{ currentYear }} </h2>
+        </div>
+        <div class="brand-card-body">
+          <div>
+            <div class="text-value">{{statistiche.manifestazioniAnnoCorrente}}</div>
+            <div class="text-uppercase text-muted small">Manifestazioni</div>
+          </div>
+          <div>
+            <div class="text-value">{{statistiche.partecipantiAnnoCorrente}}</div>
+            <div class="text-uppercase text-muted small">Partecipanti</div>
+          </div>
+        </div>
+      </div>
+    </div><!--/.col-->
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card text-white bg-google-plus">
+        <div class="card-body pb-3">
+          <div class="text-value">{{statistiche.membriAnnoCorrente}}</div>
+          <div>Membri del club</div>
+        </div>
+        <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+          <canvas baseChart class="chart"
+                  [datasets]="thisYearData"
+                  [labels]="mesi"
+                  [options]="thisYearOptions"
+                  [colors]="thisYearColours"
+                  [legend]="false"
+                  [chartType]="'line'"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div><!--/.row-->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          Varie statistiche del Club
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="callout callout-info" style="margin-top: 0px;">
+                    <small class="text-muted">Anno</small>
+                    <br>
+                    <strong class="h4">{{ lastYear }}</strong>
+                  </div>
+                </div><!--/.col-->
+                <div class="col-sm-6">
+                  <div class="callout callout-danger" style="margin-top: 0px;">
+                    <small class="text-muted">Anno</small>
+                    <br>
+                    <strong class="h4">{{ currentYear }}</strong>
+                  </div>
+                </div><!--/.col-->
+              </div><!--/.row-->
+              <hr class="mt-0">
+
+              <div class="progress-group mb-4">
+                <div class="progress-group-prepend">
+                  <span class="progress-group-text">
+                    Nuove Auto
+                  </span>
+                </div>
+                <div class="progress-group-bars">
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-info" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.autoRegistrateAnnoPrecedente)/
+                    (statistiche.autoRegistrateAnnoPrecedente +statistiche.autoRegistrateAnnoCorrente) + '%'"></div>
+                  </div>
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-danger" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.autoRegistrateAnnoCorrente)/
+                    (statistiche.autoRegistrateAnnoPrecedente +statistiche.autoRegistrateAnnoCorrente) + '%'"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="progress-group mb-4">
+                <div class="progress-group-prepend">
+                  <span class="progress-group-text">
+                    Auto Antiche
+                  </span>
+                </div>
+                <div class="progress-group-bars">
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-info" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.autoAnticheRegistrateAnnoPrecedente)/
+                    (statistiche.autoAnticheRegistrateAnnoPrecedente +statistiche.autoAnticheRegistrateAnnoCorrente) + '%'"></div>
+                  </div>
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-danger" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.autoAnticheRegistrateAnnoCorrente)/
+                    (statistiche.autoAnticheRegistrateAnnoPrecedente +statistiche.autoAnticheRegistrateAnnoCorrente) + '%'"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="progress-group mb-4">
+                <div class="progress-group-prepend">
+                  <span class="progress-group-text">
+                    Nuovi Tesserati
+                  </span>
+                </div>
+                <div class="progress-group-bars">
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-info" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.tesseratiAnnoPrecedente)/
+                    (statistiche.tesseratiAnnoPrecedente +statistiche.tesseratiAnnoCorrente) + '%'"></div>
+                  </div>
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-danger" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.tesseratiAnnoCorrente)/
+                    (statistiche.tesseratiAnnoPrecedente +statistiche.tesseratiAnnoCorrente) + '%'"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="progress-group mb-4" style="margin-bottom: 0px !important;">
+                <div class="progress-group-prepend">
+                  <span class="progress-group-text">
+                    Nuovi Visitatori
+                  </span>
+                </div>
+                <div class="progress-group-bars">
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-info" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.visitatoriAnnoPrecedente)/
+                    (statistiche.visitatoriAnnoPrecedente +statistiche.visitatoriAnnoCorrente) + '%'"></div>
+                  </div>
+                  <div class="progress progress-xs">
+                    <div class="progress-bar bg-danger" role="progressbar" [style]="'width: ' +
+                    (100*statistiche.visitatoriAnnoCorrente)/
+                    (statistiche.visitatoriAnnoPrecedente +statistiche.visitatoriAnnoCorrente) + '%'"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!--/.col-->
+          </div><!--/.row-->
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div><!--/.row-->
+</div>
